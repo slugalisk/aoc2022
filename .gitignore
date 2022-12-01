@@ -1,0 +1,3 @@
+/src/parsing/antlr_gen/*.tokens
+/src/parsing/antlr_gen/*.interp
+/target
