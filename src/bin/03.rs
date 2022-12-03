@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs;
 
 fn main() {
@@ -27,35 +27,23 @@ fn main() {
 
     let mut part1_sum = 0;
 
-    let mut found: HashMap<i32, bool> = HashMap::new();
     for s in sacks.iter() {
-        found.clear();
         let mid = s.len() / 2;
-        for w in s.iter().take(mid) {
-            found.insert(*w, true);
-        }
-        for w in s.iter().skip(mid) {
-            if found.contains_key(w) {
-                part1_sum += w;
-                break;
-            }
-        }
+        let a: HashSet<&i32> = HashSet::from_iter(s.iter().take(mid));
+        let b: HashSet<&i32> = HashSet::from_iter(s.iter().skip(mid));
+        let v = a.intersection(&b).next().unwrap();
+        part1_sum += **v;
     }
 
     println!("part1: {:?}", part1_sum);
 
     let mut part2_sum = 0;
 
-    for mut g in &sacks.iter().chunks(3) {
-        let s0 = g.next().unwrap();
-        let s1 = g.next().unwrap();
-        let s2 = g.next().unwrap();
-        let v = s0
-            .iter()
-            .find(|w| s1.contains(*w) && s2.contains(*w))
-            .unwrap();
-
-        part2_sum += v;
+    for g in &sacks.iter().chunks(3) {
+        let mut sacks: Vec<HashSet<&i32>> = g.map(|s| HashSet::from_iter(s.iter())).collect();
+        let mut v = sacks.pop().unwrap();
+        v.retain(|w| sacks[0].contains(*w) && sacks[1].contains(*w));
+        part2_sum += *(v.iter().next().unwrap());
     }
 
     println!("part2: {:?}", part2_sum);
